@@ -5,7 +5,7 @@ app = Flask(__name__)
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
-    msg = ""
+    msg = "Bienvenue dans Dave Shop"
     DATABASE = 'database.db'
     db = sqlite3.connect("database.db")
     cur = db.cursor()
@@ -32,7 +32,7 @@ def index():
             WHERE marque = ? AND taille = ?
         """, (nouveau, str(marque), int(taille)))
 
-        msg = "Commande acheter !"
+        msg = "Commande achetée !"
     db.commit()
     db.close()
     return render_template('index.html', msg=msg)

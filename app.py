@@ -13,6 +13,8 @@ def index():
     if request.method == 'POST':
         taille = request.form['taille']
         marque = request.form['marque']
+        #print("taille :", taille)
+        #print("marque : ", marque)
         
         cur.execute("""
             SELECT stock
@@ -21,9 +23,9 @@ def index():
         """, (str(marque), int(taille)))
         stock = cur.fetchall()
 
-        print("stock : ", stock)
+        #print("stock : ", stock)
         nouveau = (stock[0][0]) - 1
-        print("nouveaux stock : ", nouveau)
+        #print("nouveaux stock : ", nouveau)
         cur.execute(""" 
             UPDATE Chaussons
             SET stock = ?

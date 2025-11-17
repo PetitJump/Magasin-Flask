@@ -6,15 +6,9 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    Voici les marques :
-    {{marque}}
-    <form method="POST">
-            <label for="marque">Entrez la marque :</label><br><br>
-            <input type="text" id="marque" name="marque" required><br>
-
-            <label for="taille">Entrez la taille :</label><br><br>
-            <input type="text" id="taille" name="taille" required><br>
-            <input type="submit" value="Envoyer">
+    <form action="/marque" method="POST">
+            {{msg}}
+            <input type="submit" value="Commender">
         </form>
 </body>
 </html>

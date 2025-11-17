@@ -1,3 +1,6 @@
+#Fichier qui me sert d'exemple pour coder. Ce fichier a été coder par moi même
+#Voici son github : https://github.com/PetitJump/Magasin-chaussons-SQL-Terminal
+
 import sqlite3
 DATABASE = 'database.db'
 

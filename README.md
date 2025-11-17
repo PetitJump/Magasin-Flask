@@ -2,11 +2,11 @@
 
 ## Techniques utiliser :
 
-# Pour l'interface :
+### Pour l'interface :
 - HTML : (Avec Jinja)
 - Python : (Avec Flask)
 - CSS : (Générer par l'IA)
 
-# Pour SQL :
+### Pour SQL :
 - databse.db : (La base de donnée)
 - setup.sql : (Pour initialisé ou rénitialiser la base de donnée)

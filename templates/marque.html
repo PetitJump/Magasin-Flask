@@ -6,12 +6,15 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    Voici les marques :
-    {{marque}}
     <form action="/taille" method="POST">
-            <label for="marque">Entrez la marque que vous voulez acheter :</label><br><br>
-            <input type="text" id="marque" name="marque" required><br>
+        <label for="marque">Entrez la marque que vous voulez acheter :</label><br><br>
+            <select name="marque" id="marque">
+            {% for k in marque %}
+                <option value="{{k}}">{{k}}</option>
+            {% endfor %}
+            </select>
             <input type="submit" value="Regarder les tailles">
         </form>
+    
 </body>
 </html>

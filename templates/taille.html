@@ -11,7 +11,13 @@
     <form action="/" method="POST">
             <input type="hidden" name="marque" value="{{ marque }}"> <!-- Permet de stocker marque tout en le cachant pour que le user ne le voit pas -->
             <label for="taille">Entrez la taille :</label><br><br>
-            <input type="text" id="taille" name="taille" required><br>
+
+            <select name="taille" id="taille">
+            {% for k in tailles %}
+                <option value="{{k}}">{{k}}</option>
+            {% endfor %}
+            </select>
+
             <input type="submit" value="Acheter">
         </form>
 </body>

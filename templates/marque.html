@@ -8,11 +8,13 @@
 <body>
     <form action="/taille" method="POST">
         <label for="marque">Entrez la marque que vous voulez acheter :</label><br><br>
+
             <select name="marque" id="marque">
-            {% for k in marque %}
-                <option value="{{k}}">{{k}}</option>
+            {% for k in marque %} <!--Boucle avec jinja-->
+                <option value="{{k}}">{{k}}</option> <!--Crée un menu déroulant où il y a toute les marques-->
             {% endfor %}
             </select>
+
             <input type="submit" value="Regarder les tailles">
         </form>
     

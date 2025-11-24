@@ -5,34 +5,30 @@ app = Flask(__name__)
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
-    msg = "Bienvenue dans Dave Shop"
-    DATABASE = 'database.db'
+    msg = "Bienvenue dans Dave Shop" #Message du début
+    DATABASE = 'database.db' #On connecte la base de donnée
     db = sqlite3.connect("database.db")
     cur = db.cursor()
 
     if request.method == 'POST':
-        taille = request.form['taille']
-        marque = request.form['marque']
-        #print("taille :", taille)
-        #print("marque : ", marque)
+        taille = request.form['taille'] #On récupère la taille
+        marque = request.form['marque'] #Et la marque
         
         cur.execute("""
             SELECT stock
             FROM Chaussons
             WHERE marque = ? AND taille = ?
-        """, (str(marque), int(taille)))
+        """, (str(marque), int(taille))) #On prend le stock actuel
         stock = cur.fetchall()
 
-        #print("stock : ", stock)
-        nouveau = (stock[0][0]) - 1
-        #print("nouveaux stock : ", nouveau)
+        nouveau = (stock[0][0]) - 1 #Le nouveau stock
         cur.execute(""" 
             UPDATE Chaussons
             SET stock = ?
             WHERE marque = ? AND taille = ?
-        """, (nouveau, str(marque), int(taille)))
+        """, (nouveau, str(marque), int(taille))) #Modification du stock
 
-        msg = "Commande achetée !"
+        msg = "Commande achetée !" #Nouveau message dans le menus
     db.commit()
     db.close()
     return render_template('index.html', msg=msg)
@@ -45,11 +41,11 @@ def marque():
     cur.execute("""
                 SELECT DISTINCT marque
                 FROM Chaussons
-            """)
-    resultat = [x[0] for x in cur.fetchall()]
+            """) #On prend toutes les marques qui existent
+    resultat = [x[0] for x in cur.fetchall()] #Liste des marques
     db.commit()
     db.close()
-    return render_template('marque.html', marque=resultat)
+    return render_template('marque.html', marque=resultat) #On envoie la liste 'resultat' pour pouvoir faire un menus déroulant
 
 @app.route('/taille', methods=['GET', 'POST'])
 def taille():
@@ -57,18 +53,17 @@ def taille():
     db = sqlite3.connect("database.db")
     cur = db.cursor()
 
-    marque = request.form['marque']
+    marque = request.form['marque'] #On prend la marque que l'utilisateur à choisit
 
     cur.execute("""
             SELECT taille
             FROM Chaussons
             WHERE marque = ? AND stock > 0
-        """, (str(marque),))
+        """, (str(marque),)) #On prend toute les tailles où la marque = 'marque'
     res = [x[0] for x in cur.fetchall()]
     db.commit()
     db.close()
-    return render_template('taille.html', tailles=res, marque=marque)
-    
+    return render_template('taille.html', tailles=res, marque=marque) #On renvoie la taille choisit et la marque pour que la mise à jour se fasse dans la route 'index'
 
 if __name__ == '__main__':
     app.run(debug=True)

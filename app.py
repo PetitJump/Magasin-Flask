@@ -1,21 +1,20 @@
 from flask import Flask, render_template, request, session
 import sqlite3
 
-
 app = Flask(__name__)
 app.secret_key = "dave"
 
-
 def str_to_list(texte: str):
+    """S'occupe de passer le panier en une liste visible"""
     separer = texte.split(';')
-    rendu = []
-    renren = []
+    a = [] #Exemple : [['SCALA', '38'], ['GRIMP', '44']]
+    rendu = [] #Exemple : ["Marque : SCALA, taille : 38", "Marque : GRIMP, taille : 44"]
     for i in range(len(separer)):
-        rendu.append(separer[i].split(','))
-    for k in rendu:
-        if k != ['']:
-            renren.append(f"Marque : {k[0]}, taille : {k[1]}")
-    return renren
+        a.append(separer[i].split(','))
+    for k in a:
+        if k != ['']: #Si k n'est pas une list vide
+            rendu.append(f"Marque : {k[0]}, taille : {k[1]}") #k[0] sera toujour la marque et k[1] sera toujour un int (la taille)
+    return rendu
 
 
 def achat(panier: str, nom_panier: str):
@@ -24,13 +23,13 @@ def achat(panier: str, nom_panier: str):
     db = sqlite3.connect("database.db")
     cur = db.cursor()
 
-    separer = panier.split(';')
+    separer = panier.split(';') #Sépare la chaine de caractère avec ';'
     rendu = []
 
     for i in range(len(separer)):
-        rendu.append(separer[i].split(','))
+        rendu.append(separer[i].split(',')) #Sépare la chaine de caractère avec ','
     for k in rendu:
-        if k != ['']:
+        if k != ['']: #Si k n'est pas une list vide
             marque = k[0]
             taille = int(k[1])
             cur.execute("""
@@ -61,7 +60,7 @@ def index():
     msg = "Bienvenue dans Dave Shop" #Message du début
 
     if request.method == 'POST':
-        session.clear()
+        session.clear() #Rénisialise la session (supprime "panier" et "panier2")
         msg = "Commande achetée !" #Nouveau message dans le menus
     
     return render_template('index.html', msg=msg)
@@ -105,20 +104,20 @@ def panier():
         marque = request.form['marque'] #Et la marque
 
         if not session.get("panier"): #Si le panier est vide
-            session["panier"] = f"{marque},{taille}"
+            session["panier"] = f"{marque},{taille}" #Commence la string sans ';'
         else:
-            session["panier"] += f";{marque},{taille}"
+            session["panier"] += f";{marque},{taille}" #Commence la string avec un ';'
         
-        if not session.get("panier2"): #Si le panier est vide
-            session["panier2"] = f"{marque},{taille}"
+        if not session.get("panier2"): #Si le panier2 est vide
+            session["panier2"] = f"{marque},{taille}" #Commence la string sans ';'
         else:
-            session["panier2"] += f";{marque},{taille}"
+            session["panier2"] += f";{marque},{taille}" #Commence la string avec un ';'
 
-        print(session["panier"])  
-        print(session["panier2"])  
-        achat(session["panier"], "panier")
+        print(session["panier"]) #Test pour débugage
+        print(session["panier2"]) #Test pour débugage
+        achat(session["panier"], "panier") #Modifie la base de donnée
 
-    return render_template('panier.html', total=str_to_list(session["panier2"]))
+    return render_template('panier.html', total=str_to_list(session["panier2"])) 
 
 if __name__ == '__main__':
     app.run(debug=True)

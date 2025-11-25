@@ -18,7 +18,7 @@ def str_to_list(texte: str):
     return renren
 
 
-def achat(panier: str):
+def achat(panier: str, nom_panier: str):
     """Met a jour la base de donnée"""
     DATABASE = 'database.db' #On connecte la base de donnée
     db = sqlite3.connect("database.db")
@@ -50,7 +50,10 @@ def achat(panier: str):
     db.commit()
     db.close()
     print("Achat finis")
-    session.clear()
+    session.pop(nom_panier, None)
+
+
+################################################################################################
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -58,7 +61,7 @@ def index():
     msg = "Bienvenue dans Dave Shop" #Message du début
 
     if request.method == 'POST':
-        achat(session["panier"])
+        session.clear()
         msg = "Commande achetée !" #Nouveau message dans le menus
     
     return render_template('index.html', msg=msg)
@@ -105,10 +108,17 @@ def panier():
             session["panier"] = f"{marque},{taille}"
         else:
             session["panier"] += f";{marque},{taille}"
+        
+        if not session.get("panier2"): #Si le panier est vide
+            session["panier2"] = f"{marque},{taille}"
+        else:
+            session["panier2"] += f";{marque},{taille}"
 
-        print(session["panier"])
+        print(session["panier"])  
+        print(session["panier2"])  
+        achat(session["panier"], "panier")
 
-    return render_template('panier.html', total=str_to_list(session["panier"]))
+    return render_template('panier.html', total=str_to_list(session["panier2"]))
 
 if __name__ == '__main__':
     app.run(debug=True)

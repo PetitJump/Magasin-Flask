@@ -6,8 +6,6 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    Voici les tailles disponibles :
-    {{tailles}}
     <form action="/" method="POST">
             <input type="hidden" name="marque" value="{{ marque }}"> <!-- Permet de stocker marque tout en le cachant pour que le user ne le voit pas -->
             <label for="taille">Entrez la taille :</label><br><br>

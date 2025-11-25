@@ -1,36 +1,66 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, session
 import sqlite3
 
-app = Flask(__name__)
 
-@app.route('/', methods=['GET', 'POST'])
-def index():
-    msg = "Bienvenue dans Dave Shop" #Message du début
+app = Flask(__name__)
+app.secret_key = "dave"
+
+
+def str_to_list(texte: str):
+    separer = texte.split(';')
+    rendu = []
+    renren = []
+    for i in range(len(separer)):
+        rendu.append(separer[i].split(','))
+    for k in rendu:
+        if k != ['']:
+            renren.append(f"Marque : {k[0]}, taille : {k[1]}")
+    return renren
+
+
+def achat(panier: str):
+    """Met a jour la base de donnée"""
     DATABASE = 'database.db' #On connecte la base de donnée
     db = sqlite3.connect("database.db")
     cur = db.cursor()
 
-    if request.method == 'POST':
-        taille = request.form['taille'] #On récupère la taille
-        marque = request.form['marque'] #Et la marque
-        
-        cur.execute("""
-            SELECT stock
-            FROM Chaussons
-            WHERE marque = ? AND taille = ?
-        """, (str(marque), int(taille))) #On prend le stock actuel
-        stock = cur.fetchall()
+    separer = panier.split(';')
+    rendu = []
 
-        nouveau = (stock[0][0]) - 1 #Le nouveau stock
-        cur.execute(""" 
-            UPDATE Chaussons
-            SET stock = ?
-            WHERE marque = ? AND taille = ?
-        """, (nouveau, str(marque), int(taille))) #Modification du stock
+    for i in range(len(separer)):
+        rendu.append(separer[i].split(','))
+    for k in rendu:
+        if k != ['']:
+            marque = k[0]
+            taille = int(k[1])
+            cur.execute("""
+                SELECT stock
+                FROM Chaussons
+                WHERE marque = ? AND taille = ?
+            """, (str(marque), int(taille))) #On prend le stock actuel
+            stock = cur.fetchall()
 
-        msg = "Commande achetée !" #Nouveau message dans le menus
+            nouveau = (stock[0][0]) - 1 #Le nouveau stock
+            cur.execute(""" 
+                UPDATE Chaussons
+                SET stock = ?
+                WHERE marque = ? AND taille = ?
+            """, (nouveau, str(marque), int(taille))) #Modification du stock
+
     db.commit()
     db.close()
+    print("Achat finis")
+    session.clear()
+
+
+@app.route('/', methods=['GET', 'POST'])
+def index():
+    msg = "Bienvenue dans Dave Shop" #Message du début
+
+    if request.method == 'POST':
+        achat(session["panier"])
+        msg = "Commande achetée !" #Nouveau message dans le menus
+    
     return render_template('index.html', msg=msg)
 
 @app.route('/marque', methods=['GET', 'POST'])
@@ -64,6 +94,21 @@ def taille():
     db.commit()
     db.close()
     return render_template('taille.html', tailles=res, marque=marque) #On renvoie la taille choisit et la marque pour que la mise à jour se fasse dans la route 'index'
+
+@app.route('/panier', methods=['GET', 'POST'])
+def panier():
+    if request.method == 'POST':
+        taille = request.form['taille'] #On récupère la taille
+        marque = request.form['marque'] #Et la marque
+
+        if not session.get("panier"): #Si le panier est vide
+            session["panier"] = f"{marque},{taille}"
+        else:
+            session["panier"] += f";{marque},{taille}"
+
+        print(session["panier"])
+
+    return render_template('panier.html', total=str_to_list(session["panier"]))
 
 if __name__ == '__main__':
     app.run(debug=True)

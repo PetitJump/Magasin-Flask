@@ -6,7 +6,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    <form action="/" method="POST">
+    <form action="/panier" method="POST">
             <input type="hidden" name="marque" value="{{ marque }}"> <!-- Permet de stocker marque tout en le cachant pour que le user ne le voit pas -->
             <label for="taille">Entrez la taille :</label><br><br>
 
@@ -16,7 +16,9 @@
             {% endfor %}
             </select>
 
-            <input type="submit" value="Acheter">
-        </form>
+            <input type="submit" value="Ajouter au panier">
+    </form>
+
+    
 </body>
 </html>

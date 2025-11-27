@@ -12,4 +12,4 @@
 - setup.sql : (Pour initialisé ou rénitialiser la base de donnée)
 
 ## Bug actuels :
-- Aucun(normalement)
+- Système d'anulation du panier

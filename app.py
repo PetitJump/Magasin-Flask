@@ -42,6 +42,7 @@ def achat(panier: str, nom_panier: str, type: str):
             if type == "achat": #Si il veut supprimer 1 au stock
                 nouveau = (stock[0][0]) - 1 #Le nouveau stock
             elif type == "vendre": #Si il veut ajouter 1 au stock
+                session["argent"] = int(session["argent"]) + 10
                 nouveau = (stock[0][0]) + 1 #Le nouveau stock
 
             cur.execute(""" 
@@ -140,9 +141,11 @@ def panier():
 def retour():
 
     achat(session["panier2"], "panier2", "vendre") #Remet le stock
+    euro = session["argent"]
+    session.clear() #Rénisialise la session (supprime "panier" et "panier2")
+    session["argent"] = euro
     
-
-    return render_template('index.html', msg="Commende annuler")
+    return render_template('index.html', msg="Commende annuler", argent=session["argent"])
 
 if __name__ == '__main__':
     app.run(debug=True)

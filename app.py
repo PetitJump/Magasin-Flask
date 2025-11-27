@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, session
 import sqlite3
 
+
 app = Flask(__name__)
 app.secret_key = "dave"
 
@@ -17,7 +18,7 @@ def str_to_list(texte: str):
     return rendu
 
 
-def achat(panier: str, nom_panier: str):
+def achat(panier: str, nom_panier: str, type: str):
     """Met a jour la base de donnée"""
     DATABASE = 'database.db' #On connecte la base de donnée
     db = sqlite3.connect("database.db")
@@ -38,8 +39,11 @@ def achat(panier: str, nom_panier: str):
                 WHERE marque = ? AND taille = ?
             """, (str(marque), int(taille))) #On prend le stock actuel
             stock = cur.fetchall()
+            if type == "achat": #Si il veut supprimer 1 au stock
+                nouveau = (stock[0][0]) - 1 #Le nouveau stock
+            elif type == "vendre": #Si il veut ajouter 1 au stock
+                nouveau = (stock[0][0]) + 1 #Le nouveau stock
 
-            nouveau = (stock[0][0]) - 1 #Le nouveau stock
             cur.execute(""" 
                 UPDATE Chaussons
                 SET stock = ?
@@ -57,13 +61,19 @@ def achat(panier: str, nom_panier: str):
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
+    
+    if not session.get("argent"): #Si il n'y a pas 'argent' dans session
+        session["argent"] = 100
+    
     msg = "Bienvenue dans Dave Shop" #Message du début
 
     if request.method == 'POST':
+        euro = session["argent"]
         session.clear() #Rénisialise la session (supprime "panier" et "panier2")
+        session["argent"] = euro
         msg = "Commande achetée !" #Nouveau message dans le menus
-    
-    return render_template('index.html', msg=msg)
+        
+    return render_template('index.html', msg=msg, argent=session["argent"])
 
 @app.route('/marque', methods=['GET', 'POST'])
 def marque():
@@ -77,7 +87,7 @@ def marque():
     resultat = [x[0] for x in cur.fetchall()] #Liste des marques
     db.commit()
     db.close()
-    return render_template('marque.html', marque=resultat) #On envoie la liste 'resultat' pour pouvoir faire un menus déroulant
+    return render_template('marque.html', marque=resultat, argent=session["argent"]) #On envoie la liste 'resultat' pour pouvoir faire un menus déroulant
 
 @app.route('/taille', methods=['GET', 'POST'])
 def taille():
@@ -95,29 +105,44 @@ def taille():
     res = [x[0] for x in cur.fetchall()]
     db.commit()
     db.close()
-    return render_template('taille.html', tailles=res, marque=marque) #On renvoie la taille choisit et la marque pour que la mise à jour se fasse dans la route 'index'
+    return render_template('taille.html', tailles=res, marque=marque, argent=session["argent"]) #On renvoie la taille choisit et la marque pour que la mise à jour se fasse dans la route 'index'
 
 @app.route('/panier', methods=['GET', 'POST'])
 def panier():
     if request.method == 'POST':
         taille = request.form['taille'] #On récupère la taille
         marque = request.form['marque'] #Et la marque
+        msg = "" #Aucun message pour le moment (sauf si le user n'a plus d'argent)
+        if int(session["argent"]) >= 10:
+            session["argent"] = int(session["argent"]) - 10
 
-        if not session.get("panier"): #Si le panier est vide
-            session["panier"] = f"{marque},{taille}" #Commence la string sans ';'
-        else:
-            session["panier"] += f";{marque},{taille}" #Commence la string avec un ';'
+            if not session.get("panier"): #Si le panier est vide
+                session["panier"] = f"{marque},{taille}" #Commence la string sans ';'
+            else:
+                session["panier"] += f";{marque},{taille}" #Commence la string avec un ';'
+            
+            if not session.get("panier2"): #Si le panier2 est vide
+                session["panier2"] = f"{marque},{taille}" #Commence la string sans ';'
+            else:
+                session["panier2"] += f";{marque},{taille}" #Commence la string avec un ';'
+            
+            print(session["panier"]) #Test pour débugage
+            print(session["panier2"]) #Test pour débugage
+            achat(session["panier"], "panier", "achat") #Modifie la base de donnée
         
-        if not session.get("panier2"): #Si le panier2 est vide
-            session["panier2"] = f"{marque},{taille}" #Commence la string sans ';'
         else:
-            session["panier2"] += f";{marque},{taille}" #Commence la string avec un ';'
+            print("Vous n'avez pas asser d'argent")
+            msg = "Pas assez d'argent"
 
-        print(session["panier"]) #Test pour débugage
-        print(session["panier2"]) #Test pour débugage
-        achat(session["panier"], "panier") #Modifie la base de donnée
+    return render_template('panier.html', total=str_to_list(session["panier2"]), msg=msg, argent=session["argent"]) 
 
-    return render_template('panier.html', total=str_to_list(session["panier2"])) 
+@app.route('/retour', methods=['GET', 'POST'])
+def retour():
+
+    achat(session["panier2"], "panier2", "vendre") #Remet le stock
+    
+
+    return render_template('index.html', msg="Commende annuler")
 
 if __name__ == '__main__':
     app.run(debug=True)

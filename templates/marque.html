@@ -7,8 +7,8 @@
 </head>
 <body>
     <form action="/taille" method="POST">
+        Argent : {{argent}} €
         <label for="marque">Entrez la marque que vous voulez acheter :</label><br><br>
-
             <select name="marque" id="marque">
             {% for k in marque %} <!--Boucle avec jinja-->
                 <option value="{{k}}">{{k}}</option> <!--Crée un menu déroulant où il y a toutes les marques-->

@@ -9,6 +9,8 @@
 <body>
 
     <form action="/" method="POST">
+            {{msg}} <br>
+            Argent : {{argent}} € <br>
 
             {% for k in total %}
                 {{k}} <br>
@@ -18,6 +20,10 @@
   
     <form action="/marque" method="POST">
         <input type="submit" value="Continuer de commender">
+    </form>
+
+    <form action="/retour" method="POST">
+        <input type="submit" value="Annuler la commende">
     </form>
 
 </body>

@@ -147,5 +147,10 @@ def retour():
     
     return render_template('index.html', msg="Commende annuler", argent=session["argent"])
 
+@app.route('/ajouter', methods=['GET', 'POST'])
+def ajouter():
+    session["argent"] = int(session["argent"]) + 20
+    return render_template('index.html', msg="20€ on été ajouté à votre compte", argent=session["argent"])
+
 if __name__ == '__main__':
     app.run(debug=True)

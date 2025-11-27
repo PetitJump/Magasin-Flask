@@ -12,4 +12,4 @@
 - setup.sql : (Pour initialisé ou rénitialiser la base de donnée)
 
 ## Bug actuels :
-- Aucun (normalement)
+- Lorsque on arrive à 0€ et que l'on achète, notre argent revient à 100€

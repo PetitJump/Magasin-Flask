@@ -42,7 +42,7 @@ def achat(panier: str, nom_panier: str, type: str):
             if type == "achat": #Si il veut supprimer 1 au stock
                 nouveau = (stock[0][0]) - 1 #Le nouveau stock
             elif type == "vendre": #Si il veut ajouter 1 au stock
-                session["argent"] = int(session["argent"]) + 10
+                session["argent"] = float(session["argent"]) + 10
                 nouveau = (stock[0][0]) + 1 #Le nouveau stock
 
             cur.execute(""" 
@@ -64,7 +64,7 @@ def achat(panier: str, nom_panier: str, type: str):
 def index():
     
     if not session.get("argent"): #Si il n'y a pas 'argent' dans session
-        session["argent"] = 100
+        session["argent"] = 50
     
     msg = "Bienvenue dans Dave Shop" #Message du début
 
@@ -104,19 +104,39 @@ def taille():
             FROM Chaussons
             WHERE marque = ? AND stock > 0
         """, (str(marque),)) #On prend toute les tailles où la marque = 'marque'
-    res = [x[0] for x in cur.fetchall()]
+    tailles = [f"Taille : {x[0]}" for x in cur.fetchall()]
+
+    cur.execute("""
+            SELECT stock
+            FROM Chaussons
+            WHERE marque = ? AND stock > 0
+        """, (str(marque),)) #On prend toute les tailles où la marque = 'marque'
+    stock = [f"Stock : {x[0]}" for x in cur.fetchall()]
+
+    cur.execute("""
+            SELECT prix
+            FROM Chaussons
+            WHERE marque = ? AND stock > 0
+        """, (str(marque),)) #On prend toute les tailles où la marque = 'marque'
+    prix = [f"Prix : {x[0]}" for x in cur.fetchall()]
+
+    for i in range(len(tailles)):
+        tailles[i] += f"/ {stock[i]} / {prix[i]}"
+
     db.commit()
     db.close()
-    return render_template('taille.html', tailles=res, argent=session["argent"]) #On renvoie la taille choisit et la marque pour que la mise à jour se fasse dans la route 'index'
+    return render_template('taille.html', tailles=tailles, argent=session["argent"]) #On renvoie la taille choisit et la marque pour que la mise à jour se fasse dans la route 'index'
 
 @app.route('/panier', methods=['GET', 'POST'])
 def panier():
     if request.method == 'POST':
-        taille = request.form['taille'] #On récupère la taille
+        taille = request.form['taille'] #On récupère le choix : (Taille : 34 / Stock : ...)
+        taille = taille[9:11] #Prend juste la taille
         marque = session["marque"] #Et la marque
         msg = "" #Aucun message pour le moment (sauf si le user n'a plus d'argent)
-        if int(session["argent"]) >= 10:
-            session["argent"] = int(session["argent"]) - 10
+        if float(session["argent"]) >= 10: #Si il peut acheter son chaussons
+            
+            session["argent"] = float(session["argent"]) - 10
 
             if not session.get("panier"): #Si le panier est vide
                 session["panier"] = f"{marque},{taille}" #Commence la string sans ';'
@@ -150,7 +170,7 @@ def retour():
 
 @app.route('/ajouter', methods=['GET', 'POST'])
 def ajouter():
-    session["argent"] = int(session["argent"]) + 20
+    session["argent"] = float(session["argent"]) + 20
     return render_template('index.html', msg="20€ on été ajouté à votre compte", argent=session["argent"])
 
 if __name__ == '__main__':

@@ -8,7 +8,7 @@
 <body>
     <form action="/panier" method="POST">
             Argent : {{argent}} € <br>
-            <label for="taille">Entrez la taille :</label><br><br>
+            <label for="taille">Entrez la commande de votre choix :</label><br><br>
 
             <select name="taille" id="taille">
             {% for k in tailles %}
@@ -18,9 +18,6 @@
 
             <input type="submit" value="Ajouter au panier">
     </form>
-
-    
-    
 
     
 </body>

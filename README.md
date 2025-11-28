@@ -13,3 +13,6 @@
 
 ## Bug actuels :
 - Lorsque on arrive à 0€ et que l'on achète, notre argent revient à 100€
+
+## Amélioration possible :
+- Ajouter un moyen pour mettre le vrai prix des chaussons au lieu de mettre tout les chaussons à 10€

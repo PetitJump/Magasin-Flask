@@ -1,6 +1,6 @@
-DROP TABLE IF EXISTS Chaussons;
+DROP TABLE IF EXISTS Chaussons; 
 
-CREATE TABLE Chaussons (
+CREATE TABLE Chaussons ( --Crée la table principale Chaussons
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     marque TEXT NOT NULL,
     taille INTEGER NOT NULL,

@@ -97,6 +97,7 @@ def taille():
     cur = db.cursor()
 
     marque = request.form['marque'] #On prend la marque que l'utilisateur à choisit
+    session["marque"] = marque
 
     cur.execute("""
             SELECT taille
@@ -106,13 +107,13 @@ def taille():
     res = [x[0] for x in cur.fetchall()]
     db.commit()
     db.close()
-    return render_template('taille.html', tailles=res, marque=marque, argent=session["argent"]) #On renvoie la taille choisit et la marque pour que la mise à jour se fasse dans la route 'index'
+    return render_template('taille.html', tailles=res, argent=session["argent"]) #On renvoie la taille choisit et la marque pour que la mise à jour se fasse dans la route 'index'
 
 @app.route('/panier', methods=['GET', 'POST'])
 def panier():
     if request.method == 'POST':
         taille = request.form['taille'] #On récupère la taille
-        marque = request.form['marque'] #Et la marque
+        marque = session["marque"] #Et la marque
         msg = "" #Aucun message pour le moment (sauf si le user n'a plus d'argent)
         if int(session["argent"]) >= 10:
             session["argent"] = int(session["argent"]) - 10
